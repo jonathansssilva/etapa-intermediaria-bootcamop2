@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Finanças e Tarefas</title>
+    
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="gastos">💸 Gastos</button>
+            <button class="tab-button" data-tab="tarefas">✅ Tarefas</button>
+        </div>
+
+        <div id="gastos" class="tab-content active">
+            <form id="gastoForm">
+                <div class="form-group">
+                    <input type="text" id="gastoDescricao" placeholder="Descrição do gasto..." required>
+                    <input type="number" id="gastoValor" placeholder="R$ 0,00" step="0.01" min="0.01" required>
+                </div>
+                <div class="form-group">
+                    <select id="gastoCategoria" required>
+                        <option value="">Selecione a categoria</option>
+                        <option value="Alimentação">🍔 Alimentação</option>
+                        <option value="Transporte">🚌 Transporte</option>
+                        <option value="Moradia">🏠 Moradia</option>
+                        <option value="Lazer">🎮 Lazer</option>
+                        <option value="Outros">📦 Outros</option>
+                    </select>
+                    <input type="date" id="gastoData" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Gasto</button>
+            </form>
+
+            <h3 style="margin: 20px 0 10px;">Meus Gastos</h3>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="Alimentação">Alimentação</button>
+                <button class="filter-btn" data-filter="Transporte">Transporte</button>
+                <button class="filter-btn" data-filter="Moradia">Moradia</button>
+                <button class="filter-btn" data-filter="Lazer">Lazer</button>
+                <button class="filter-btn" data-filter="Outros">Outros</button>
+            </div>
+
+            <div id="gastosList" class="list-container"></div>
+
+            <div class="stats">
+                <span>Total de Registros: <span id="countGastos">0</span></span>
+                <footer>
+                    <p> &copy; 2026 - Versão 1.0.0</p>
+                </footer>
+                <span>Total Gasto: <span id="totalGastos">R$ 0,00</span></span>
+            </div>
+        </div>
+
+        <div id="tarefas" class="tab-content">
+            <form id="tarefaForm">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input type="text" id="tarefaDescricao" placeholder="O que você precisa fazer?" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+            </form>
+
+            <h3 style="margin: 20px 0 10px;">Minhas Tarefas</h3>
+            
+            <div id="tarefasList" class="list-container"></div>
+
+            <div class="stats">
+                <span>Pendentes: <span id="tarefasPendentes">0</span></span>
+                <span>Concluídas: <span id="tarefasConcluidas">0</span></span>
+            </div>
+        </div>
+    </div>
+
+
+
+
+        <style>
+        
+        :root {
+            --primary: #1055bc;
+            --primary-hover: #1055bc;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+
+        .app-container {
+            width: 100%; max-width: 600px; background: var(--surface); border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;
+        }
+
+        
+        .tabs { display: flex; border-bottom: 1px solid var(--border); background: #f8fafc; }
+        .tab-button {
+            flex: 1; padding: 15px; border: none; background: none; font-weight: 600;
+            color: var(--text-light); cursor: pointer; transition: all 0.2s; font-size: 16px;
+        }
+        .tab-button:hover { background: #f1f5f9; }
+        .tab-button.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: var(--surface); }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        
+        .form-group { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        input, select {
+            flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px;
+            outline: none; font-size: 14px; min-width: 120px;
+        }
+        input:focus, select:focus { border-color: var(--primary); }
+        
+        .btn {
+            padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: 600; color: white; transition: 0.2s;
+        }
+        .btn-primary { background: var(--primary); width: 100%; margin-top: 10px; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--danger); padding: 5px 10px; border-radius: 4px; }
+        .btn-danger:hover { background: var(--danger-hover); }
+
+        
+        .filters { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn {
+            padding: 5px 12px; border: 1px solid var(--border); background: var(--surface);
+            border-radius: 20px; cursor: pointer; font-size: 12px; white-space: nowrap;
+        }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .list-container { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        
+        .item-gasto, .item-tarefa {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa;
+        }
+        
+        
+        .gasto-info { display: flex; flex-direction: column; flex: 1; }
+        .gasto-descricao { font-weight: 600; margin-bottom: 4px; }
+        .gasto-meta { display: flex; gap: 10px; font-size: 12px; color: var(--text-light); align-items: center; }
+        .categoria-badge { background: #e0e7ff; color: var(--primary); padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+        .gasto-valor { font-weight: bold; margin-right: 15px; color: #059669; }
+
+        
+        .item-tarefa.concluida .tarefa-texto { text-decoration: line-through; color: var(--text-light); }
+        .checkbox-custom { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; }
+        .tarefa-texto { flex: 1; }
+
+        
+        .stats {
+            display: flex; justify-content: space-between; padding-top: 15px;
+            border-top: 1px solid var(--border); font-size: 14px; font-weight: 600;
+        }
+        .empty-message { text-align: center; color: var(--text-light); font-style: italic; padding: 20px 0; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+
+    <script>
+        class GestorDados {
+            constructor() {
+                this.gastos = JSON.parse(localStorage.getItem('gastos') || '[]');
+                this.tarefas = JSON.parse(localStorage.getItem('tarefas') || '[]');
+            }
+
+            salvar(chave) { localStorage.setItem(chave, JSON.stringify(this[chave])); }
+
+            
+            addGasto(descricao, valor, categoria, data) {
+                this.gastos.push({ id: Date.now(), descricao, valor: +valor, categoria, data, dataCriacao: new Date().toISOString() });
+                this.salvar('gastos');
+            }
+            rmGasto(id) { this.gastos = this.gastos.filter(g => g.id !== id); this.salvar('gastos'); }
+            getGastos(cat) { return cat === 'todos' ? this.gastos : this.gastos.filter(g => g.categoria === cat); }
+            getTotalGastos() { return this.gastos.reduce((t, g) => t + g.valor, 0); }
+
+            
+            addTarefa(descricao) {
+                this.tarefas.push({ id: Date.now(), descricao, concluida: false, dataCriacao: new Date().toISOString() });
+                this.salvar('tarefas');
+            }
+            altTarefa(id) {
+                const t = this.tarefas.find(t => t.id === id);
+                if (t) { t.concluida = !t.concluida; this.salvar('tarefas'); }
+            }
+            rmTarefa(id) { this.tarefas = this.tarefas.filter(t => t.id !== id); this.salvar('tarefas'); }
+            statusTarefas() {
+                return { 
+                    pendentes: this.tarefas.filter(t => !t.concluida).length, 
+                    concluidas: this.tarefas.filter(t => t.concluida).length 
+                };
+            }
+        }
+
+        class GestorInterface {
+            constructor() {
+                this.dados = new GestorDados();
+                this.filtro = 'todos';
+                this.init();
+            }
+
+            init() {
+                const $ = id => document.getElementById(id);
+                const $$ = sel => document.querySelectorAll(sel);
+
+                $$('.tab-button').forEach(b => b.addEventListener('click', e => this.mudarAba(e.target.dataset.tab)));
+                $('gastoForm').addEventListener('submit', e => this.addGasto(e));
+                $('tarefaForm').addEventListener('submit', e => this.addTarefa(e));
+                
+                $$('.filter-btn').forEach(b => b.addEventListener('click', e => {
+                    this.filtro = e.target.dataset.filter;
+                    $$('.filter-btn').forEach(btn => btn.classList.toggle('active', btn === e.target));
+                    this.updateAll();
+                }));
+
+                $('gastosList').addEventListener('click', e => {
+                    if (e.target.closest('.btn-remover-gasto') && confirm('Remover gasto?')) {
+                        this.dados.rmGasto(+e.target.closest('button').dataset.id); this.updateAll();
+                    }
+                });
+
+                $('tarefasList').addEventListener('click', e => {
+                    const id = +(e.target.dataset.id || e.target.closest('button')?.dataset.id);
+                    if (e.target.closest('.btn-remover-tarefa') && confirm('Remover tarefa?')) { this.dados.rmTarefa(id); this.updateAll(); }
+                    if (e.target.classList.contains('checkbox-tarefa')) { this.dados.altTarefa(id); this.updateAll(); }
+                });
+
+                $('gastoData').value = new Date().toISOString().split('T')[0];
+                this.updateAll();
+            }
+
+            mudarAba(aba) {
+                document.querySelectorAll('.tab-button, .tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelector(`[data-tab="${aba}"]`).classList.add('active');
+                document.getElementById(aba).classList.add('active');
+            }
+
+            addGasto(e) {
+                e.preventDefault();
+                const [desc, val, cat, data] = ['Descricao', 'Valor', 'Categoria', 'Data'].map(id => document.getElementById(`gasto${id}`).value);
+                if (!desc.trim() || !val || !cat || !data || +val <= 0) return alert('Preencha corretamente. Valor > 0');
+                this.dados.addGasto(desc, val, cat, data);
+                e.target.reset(); document.getElementById('gastoData').value = new Date().toISOString().split('T')[0];
+                this.updateAll();
+            }
+
+            addTarefa(e) {
+                e.preventDefault();
+                const desc = document.getElementById('tarefaDescricao').value.trim();
+                if (desc.length < 3) return alert('Mínimo de 3 caracteres');
+                this.dados.addTarefa(desc);
+                e.target.reset(); this.updateAll();
+            }
+
+            esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+            fmt(val) { return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+
+            updateAll() {
+                const gastos = this.dados.getGastos(this.filtro);
+                document.getElementById('gastosList').innerHTML = gastos.length ? gastos.sort((a,b) => new Date(b.data)-new Date(a.data)).map(g => `
+                    <div class="item-gasto"><div class="gasto-info"><div class="gasto-descricao">${this.esc(g.descricao)}</div>
+                    <div class="gasto-meta"><span class="categoria-badge">${g.categoria}</span><span>${new Date(g.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</span></div></div>
+                    <div class="gasto-valor">${this.fmt(g.valor)}</div><button class="btn btn-danger btn-remover-gasto" data-id="${g.id}">✕</button></div>`).join('') 
+                    : '<p class="empty-message">Nenhum gasto encontrado</p>';
+                
+                document.getElementById('totalGastos').textContent = this.fmt(this.dados.getTotalGastos());
+                document.getElementById('countGastos').textContent = this.dados.gastos.length;
+
+                const tarefas = this.dados.tarefas;
+                document.getElementById('tarefasList').innerHTML = tarefas.length ? [...tarefas].sort((a,b) => a.concluida === b.concluida ? new Date(b.dataCriacao)-new Date(a.dataCriacao) : a.concluida?1:-1).map(t => `
+                    <div class="item-tarefa ${t.concluida ? 'concluida' : ''}"><input type="checkbox" class="checkbox-custom checkbox-tarefa" data-id="${t.id}" ${t.concluida ? 'checked' : ''}>
+                    <span class="tarefa-texto">${this.esc(t.descricao)}</span><div class="tarefa-actions"><button class="btn btn-danger btn-remover-tarefa" data-id="${t.id}">✕</button></div></div>`).join('') 
+                    : '<p class="empty-message">Nenhuma tarefa registrada</p>';
+                
+                const st = this.dados.statusTarefas();
+                document.getElementById('tarefasPendentes').textContent = st.pendentes;
+                document.getElementById('tarefasConcluidas').textContent = st.concluidas;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new GestorInterface());
+    </script>
+</body>
+</html>
